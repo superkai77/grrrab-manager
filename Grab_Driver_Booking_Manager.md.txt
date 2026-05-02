@@ -1,0 +1,154 @@
+# Grab Driver Booking Manager
+
+A modern, mobile-first web application designed to help Grab drivers efficiently manage customer bookings. This single-page app works entirely in your browser with offline support and automatic data persistence using localStorage.
+
+## Features
+
+**Core Booking Management**
+
+The application provides a complete booking management system with form fields for customer name, destination, number of passengers, date, and time. Additional optional fields include pickup location, phone number, estimated fare, and notes for special requests. All bookings are automatically saved to your browser's local storage, ensuring your data persists even after closing the app.
+
+**Schedule Views**
+
+The app displays bookings in multiple organized views. Today's bookings appear at the top sorted by time, upcoming bookings are grouped by date, and completed bookings are archived in the history section. A monthly calendar view lets you see all bookings at a glance with booking counts displayed on each date.
+
+**Quick Actions**
+
+Each booking card includes action buttons to edit, mark as completed, or delete bookings. The edit function allows you to update any booking details without losing your data. Marking a booking as completed moves it to the history section, and deletion removes it permanently (with a confirmation prompt).
+
+**Daily Statistics**
+
+A sidebar displays real-time statistics including today's booking count, total passengers for today, estimated earnings from today's bookings, and total bookings for the current week. These stats update automatically as you add, edit, or complete bookings.
+
+**Bilingual Support**
+
+The interface supports both English and Bahasa Malaysia. Toggle between languages by clicking the language button in the sidebar (desktop) or mobile menu. All labels, buttons, and messages update instantly.
+
+**Offline Capability**
+
+The app works completely offline thanks to service worker technology. Your bookings remain accessible even without an internet connection, and all changes sync when you're back online.
+
+## Getting Started
+
+### Quick Start (No Installation)
+
+1. Download the `index.html` file to your computer
+2. Double-click the file to open it in your web browser
+3. The app loads immediately and is ready to use
+4. Start adding bookings using the "+ New Booking" button
+
+### Adding a Booking
+
+Click the "+ New Booking" button to open the booking form. Fill in the required fields: customer name, destination, number of passengers, date, and time. Optional fields include pickup location, phone number, estimated fare, and notes. Click "Save Booking" to add it to your schedule. The booking appears immediately in the appropriate view (today, upcoming, or calendar).
+
+### Managing Bookings
+
+For any booking, you can click the "Edit" button to modify details, "Complete" to mark it as finished and move it to history, or "Delete" to remove it. Today's bookings are highlighted at the top of the app and sorted by time for easy reference.
+
+### Viewing Your Schedule
+
+Switch between different views using the tabs at the top: Today shows only today's active bookings, Upcoming displays all future bookings grouped by date, Calendar provides a monthly view with booking counts, and History shows all completed bookings.
+
+## Installation as PWA (Phone Home Screen)
+
+### iOS (iPhone/iPad)
+
+1. Open this app in Safari
+2. Tap the Share button (arrow pointing out of a box)
+3. Scroll down and tap "Add to Home Screen"
+4. Enter a name (e.g., "Grab Bookings") and tap "Add"
+5. The app now appears on your home screen and opens like a native app
+
+### Android
+
+1. Open this app in Chrome or Firefox
+2. Tap the menu button (three dots) in the top right
+3. Tap "Install app" or "Add to Home Screen"
+4. Confirm the installation
+5. The app now appears on your home screen with offline support
+
+## Hosting Options
+
+### Option 1: Netlify Drop (Recommended - Easiest)
+
+Netlify Drop provides free hosting with a shareable link. No account required.
+
+1. Visit [https://app.netlify.com/drop](https://app.netlify.com/drop)
+2. Drag and drop all three files (`index.html`, `manifest.json`, `sw.js`) into the drop zone
+3. Your app is instantly live with a unique URL
+4. Share the link with others or bookmark it
+5. Your bookings are stored locally in each browser, so each device maintains its own data
+
+### Option 2: GitHub Pages (Free, Permanent)
+
+GitHub Pages provides free hosting directly from a GitHub repository.
+
+1. Create a GitHub account at [https://github.com](https://github.com)
+2. Create a new repository named `grab-driver-bookings` (or any name)
+3. Upload the three files (`index.html`, `manifest.json`, `sw.js`) to the repository
+4. Go to repository Settings → Pages
+5. Select "Deploy from a branch" and choose the `main` branch
+6. Your app is live at `https://yourusername.github.io/grab-driver-bookings`
+7. Enable GitHub Pages and your app is permanently hosted for free
+
+### Option 3: Local File (Simplest)
+
+Simply keep the `index.html` file on your computer and double-click it to open in your browser. This works offline and stores data locally. You can copy the file to a USB drive or cloud storage (Google Drive, OneDrive, Dropbox) to access it from multiple devices.
+
+### Option 4: Self-Hosted Server
+
+If you have web hosting, upload all three files to your server's public directory. Ensure your server supports HTTPS for the service worker to function properly. The app works on any standard web server without requiring backend code.
+
+## Data Storage & Privacy
+
+All your booking data is stored exclusively in your browser's local storage. No data is sent to any server or cloud service. Each browser and device maintains its own separate copy of your bookings. If you clear your browser's cache or storage, your bookings will be deleted. To back up your data, you can export bookings by taking screenshots or manually noting important details.
+
+## Browser Compatibility
+
+The app works on all modern browsers including Chrome, Firefox, Safari, and Edge. It requires JavaScript to be enabled. The service worker (offline support) works on Chrome, Firefox, and Edge. Safari on iOS has limited offline support but the app still functions normally online.
+
+## Troubleshooting
+
+**Bookings not saving:** Ensure your browser allows local storage. Check if you're in private/incognito mode, as some browsers disable storage in private mode. Try a different browser if the issue persists.
+
+**App not loading:** Clear your browser cache and reload the page. Ensure JavaScript is enabled in your browser settings. Try opening the file in a different browser.
+
+**Offline mode not working:** The service worker requires HTTPS to function (except for localhost). If hosting online, ensure your server uses HTTPS. Offline mode works on all local file opens.
+
+**Language not changing:** Try refreshing the page after changing language. Clear your browser cache if the change doesn't persist.
+
+## Technical Details
+
+This application is built with vanilla JavaScript (no frameworks), Tailwind CSS for styling, and the Fetch API for any network operations. The service worker enables offline functionality by caching the app shell and serving cached content when offline. All data persists using the browser's localStorage API, which provides 5-10MB of storage depending on the browser.
+
+## Future Enhancements
+
+Potential features for future versions include cloud synchronization across devices, integration with ride-sharing APIs for real-time updates, SMS notifications for booking reminders, export to CSV or PDF for record keeping, and integration with payment systems for instant settlement.
+
+## Support & Feedback
+
+For issues or feature requests, please ensure you're using the latest version of your browser. Test in a different browser to isolate browser-specific issues. Keep a backup of important booking data by regularly reviewing and noting key information.
+
+## License
+
+This application is provided as-is for personal use by Grab drivers. Feel free to modify and customize it for your needs.
+
+---
+
+**Bahasa Malaysia / বাংলা**
+
+### Panduan Cepat (Bahasa Malaysia)
+
+Aplikasi ini membantu anda menguruskan tempahan pelanggan dengan mudah. Semua data disimpan dalam pelayar anda secara automatik. Tiada perlu akaun atau pendaftaran. Klik "Tempahan Baru" untuk memulai, isi maklumat pelanggan, dan simpan. Lihat semua tempahan anda dalam pelbagai pandangan: Hari Ini, Akan Datang, Kalendar, dan Sejarah.
+
+Untuk memasang di skrin rumah telefon anda: Di iOS, ketik Kongsi → Tambah ke Skrin Rumah. Di Android, ketik menu tiga titik → Pasang aplikasi.
+
+Untuk menghos secara percuma: Kunjungi Netlify Drop dan seret ketiga fail ke sana, atau muat naik ke GitHub Pages untuk hos kekal.
+
+Semua tempahan disimpan secara tempatan dalam pelayar anda. Tiada data dihantar ke pelayan. Setiap peranti mempunyai salinan data sendiri.
+
+---
+
+**Version:** 1.0.0  
+**Last Updated:** May 2026  
+**Author:** Manus AI

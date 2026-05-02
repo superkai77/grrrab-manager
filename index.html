@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Grab Driver Booking Manager - Manage customer bookings efficiently">
+    <meta name="theme-color" content="#00B14F">
+    <title>Grab Driver Booking Manager</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%2300B14F' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dy='.3em'>G</text></svg>">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafafa;
+        }
+        
+        .grab-green {
+            color: #00B14F;
+        }
+        
+        .grab-green-bg {
+            background-color: #00B14F;
+        }
+        
+        .grab-green-border {
+            border-color: #00B14F;
+        }
+        
+        .grab-green-text-hover:hover {
+            color: #009640;
+        }
+        
+        .accent-line {
+            border-left: 3px solid #00B14F;
+        }
+        
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+        
+        .card-hover:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: #00B14F;
+            color: white;
+        }
+        
+        .status-pending {
+            background-color: #FBBF24;
+            color: #78350F;
+        }
+        
+        .status-completed {
+            background-color: #D1D5DB;
+            color: #374151;
+        }
+        
+        .status-cancelled {
+            background-color: #EF4444;
+            color: white;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+            max-width: 90%;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #00B14F;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .toast.info {
+            border-left: 4px solid #3B82F6;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: flex-end;
+            z-index: 999;
+        }
+        
+        .modal-overlay.hidden {
+            display: none;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @media (min-width: 768px) {
+            .modal-overlay {
+                align-items: center;
+            }
+            
+            .modal-content {
+                border-radius: 16px;
+                width: 90%;
+                max-width: 500px;
+            }
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #E5E7EB;
+        }
+        
+        .calendar-day.today {
+            background-color: #00B14F;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .calendar-day.selected {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+            font-weight: 600;
+        }
+        
+        .calendar-day.other-month {
+            color: #D1D5DB;
+        }
+        
+        .tab-button {
+            padding: 12px 16px;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #6B7280;
+        }
+        
+        .tab-button.active {
+            color: #00B14F;
+            border-bottom-color: #00B14F;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #00B14F;
+            box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background-color: #00B14F;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #009640;
+        }
+        
+        .btn-secondary {
+            background-color: #F3F4F6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #E5E7EB;
+        }
+        
+        .btn-danger {
+            background-color: #FEE2E2;
+            color: #DC2626;
+        }
+        
+        .btn-danger:hover {
+            background-color: #FECACA;
+        }
+        
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-stat {
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-top: 4px;
+        }
+        
+        .stat-value.grab-green {
+            color: #00B14F;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-white border-r border-gray-200 overflow-y-auto hidden md:block">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 grab-green-bg rounded-lg flex items-center justify-center text-white font-bold text-lg">G</div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900">Grab Driver</h1>
+                        <p class="text-xs text-gray-500">Booking Manager</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="sidebar-stat">
+                    <div class="stat-label">Today's Bookings</div>
+                    <div class="stat-value" id="todayCount">0</div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">Total Passengers</div>
+                    <div class="stat-value" id="totalPax">0</div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">Est. Earnings</div>
+                    <div class="stat-value grab-green" id="totalEarnings">RM 0</div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">This Week</div>
+                    <div class="stat-value" id="weekCount">0</div>
+                </div>
+            </div>
+            
+            <div class="p-6 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 mb-4">Calendar</h3>
+                <div id="miniCalendar" class="calendar-grid"></div>
+            </div>
+            
+            <div class="p-6 border-t border-gray-200">
+                <button onclick="app.showLanguageMenu()" class="w-full text-left text-sm text-gray-600 hover:text-gray-900 py-2 px-3 rounded hover:bg-gray-100">
+                    <span id="langLabel">English</span> / <span id="langLabelBM">Bahasa Malaysia</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="sticky-header px-4 md:px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="app.toggleMobileMenu()" class="md:hidden p-2 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" id="headerTitle">Today's Bookings</h2>
+                        <p class="text-sm text-gray-500" id="headerDate"></p>
+                    </div>
+                </div>
+                <button onclick="app.showBookingModal()" class="btn btn-primary">
+                    <span class="hidden sm:inline">+ New Booking</span>
+                    <span class="sm:hidden">+</span>
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex gap-0 border-b border-gray-200 px-4 md:px-8 overflow-x-auto">
+                <button onclick="app.switchTab('today')" class="tab-button active" id="tab-today">
+                    <span class="hidden sm:inline">Today</span>
+                    <span class="sm:hidden">Today</span>
+                </button>
+                <button onclick="app.switchTab('upcoming')" class="tab-button" id="tab-upcoming">Upcoming</button>
+                <button onclick="app.switchTab('calendar')" class="tab-button" id="tab-calendar">Calendar</button>
+                <button onclick="app.switchTab('history')" class="tab-button" id="tab-history">History</button>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto px-4 md:px-8 py-6">
+                <!-- Today's Bookings -->
+                <div id="todayView" class="space-y-4">
+                    <div id="todayBookings" class="space-y-3"></div>
+                    <div id="todayEmpty" class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-lg">No bookings for today</p>
+                        <p class="text-gray-400 text-sm">Create a new booking to get started</p>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Bookings -->
+                <div id="upcomingView" class="hidden space-y-4">
+                    <div id="upcomingBookings" class="space-y-3"></div>
+                    <div id="upcomingEmpty" class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-lg">No upcoming bookings</p>
+                    </div>
+                </div>
+                
+                <!-- Calendar View -->
+                <div id="calendarView" class="hidden">
+                    <div class="bg-white rounded-lg p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900" id="calendarMonth"></h3>
+                            <div class="flex gap-2">
+                                <button onclick="app.previousMonth()" class="btn btn-secondary btn-small">← Prev</button>
+                                <button onclick="app.todayMonth()" class="btn btn-secondary btn-small">Today</button>
+                                <button onclick="app.nextMonth()" class="btn btn-secondary btn-small">Next →</button>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <div class="grid grid-cols-7 gap-2 mb-2">
+                                <div class="text-center text-sm font-semibold text-gray-500">Sun</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Mon</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Tue</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Wed</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Thu</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Fri</div>
+                                <div class="text-center text-sm font-semibold text-gray-500">Sat</div>
+                            </div>
+                            <div id="calendarGrid" class="calendar-grid"></div>
+                        </div>
+                    </div>
+                    <div id="calendarDetails" class="mt-6 space-y-3"></div>
+                </div>
+                
+                <!-- History View -->
+                <div id="historyView" class="hidden space-y-4">
+                    <div id="historyBookings" class="space-y-3"></div>
+                    <div id="historyEmpty" class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-lg">No completed bookings yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900" id="modalTitle">New Booking</h3>
+                <button onclick="app.closeBookingModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="bookingForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="labelCustomerName">Customer Name</label>
+                    <input type="text" id="customerName" class="input-field" placeholder="e.g., Radin Mustakim" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="labelPickupLocation">Pickup Location (Optional)</label>
+                    <input type="text" id="pickupLocation" class="input-field" placeholder="e.g., Target Baru">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="labelDestination">Destination</label>
+                    <input type="text" id="destination" class="input-field" placeholder="e.g., Perwira" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="labelPax">Number of Passengers</label>
+                        <input type="number" id="pax" class="input-field" min="1" max="6" value="1" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="labelFare">Estimated Fare (RM)</label>
+                        <input type="number" id="fare" class="input-field" min="0" step="0.50" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="labelDate">Date</label>
+                        <input type="date" id="bookingDate" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="labelTime">Time</label>
+                        <input type="time" id="bookingTime" class="input-field" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="labelPhone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" class="input-field" placeholder="e.g., 012-3456789">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="labelNotes">Notes (Optional)</label>
+                    <textarea id="notes" class="input-field" rows="3" placeholder="e.g., Customer prefers AC on, non-smoking"></textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="app.closeBookingModal()" class="flex-1 btn btn-secondary" id="btnCancel">Cancel</button>
+                    <button type="submit" class="flex-1 btn btn-primary" id="btnSave">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden fixed inset-0 z-40 md:hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="app.toggleMobileMenu()"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-64 bg-white overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="w-10 h-10 grab-green-bg rounded-lg flex items-center justify-center text-white font-bold text-lg">G</div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900">Grab Driver</h1>
+                        <p class="text-xs text-gray-500">Booking Manager</p>
+                    </div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">Today's Bookings</div>
+                    <div class="stat-value" id="mobileToday">0</div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">Total Passengers</div>
+                    <div class="stat-value" id="mobilePax">0</div>
+                </div>
+                
+                <div class="sidebar-stat">
+                    <div class="stat-label">Est. Earnings</div>
+                    <div class="stat-value grab-green" id="mobileEarnings">RM 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Translations
+        const translations = {
+            en: {
+                todayBookings: "Today's Bookings",
+                upcomingBookings: "Upcoming Bookings",
+                completedBookings: "Completed Bookings",
+                newBooking: "New Booking",
+                editBooking: "Edit Booking",
+                customerName: "Customer Name",
+                pickupLocation: "Pickup Location",
+                destination: "Destination",
+                numberOfPax: "Number of Passengers",
+                estimatedFare: "Estimated Fare (RM)",
+                date: "Date",
+                time: "Time",
+                phone: "Phone Number",
+                notes: "Notes",
+                cancel: "Cancel",
+                save: "Save Booking",
+                edit: "Edit",
+                delete: "Delete",
+                complete: "Complete",
+                markComplete: "Mark as Completed",
+                deleteConfirm: "Are you sure you want to delete this booking?",
+                bookingAdded: "Booking added successfully",
+                bookingUpdated: "Booking updated successfully",
+                bookingDeleted: "Booking deleted",
+                bookingCompleted: "Booking marked as completed",
+                noBookings: "No bookings",
+                time_short: "Time",
+                pax_short: "Pax",
+                fare_short: "Fare",
+                status: "Status",
+                active: "Active",
+                pending: "Pending",
+                completed: "Completed",
+                cancelled: "Cancelled",
+                todayCount: "Today's Bookings",
+                totalPax: "Total Passengers",
+                estEarnings: "Est. Earnings",
+                thisWeek: "This Week",
+                optional: "(Optional)"
+            },
+            bm: {
+                todayBookings: "Tempahan Hari Ini",
+                upcomingBookings: "Tempahan Akan Datang",
+                completedBookings: "Tempahan Selesai",
+                newBooking: "Tempahan Baru",
+                editBooking: "Edit Tempahan",
+                customerName: "Nama Pelanggan",
+                pickupLocation: "Lokasi Jemput",
+                destination: "Destinasi",
+                numberOfPax: "Bilangan Penumpang",
+                estimatedFare: "Anggaran Tambang (RM)",
+                date: "Tarikh",
+                time: "Masa",
+                phone: "Nombor Telefon",
+                notes: "Catatan",
+                cancel: "Batal",
+                save: "Simpan Tempahan",
+                edit: "Edit",
+                delete: "Padam",
+                complete: "Selesai",
+                markComplete: "Tandakan Selesai",
+                deleteConfirm: "Anda pasti ingin memadam tempahan ini?",
+                bookingAdded: "Tempahan ditambah dengan berjaya",
+                bookingUpdated: "Tempahan dikemas kini dengan berjaya",
+                bookingDeleted: "Tempahan telah dipadamkan",
+                bookingCompleted: "Tempahan ditandakan selesai",
+                noBookings: "Tiada tempahan",
+                time_short: "Masa",
+                pax_short: "Penumpang",
+                fare_short: "Tambang",
+                status: "Status",
+                active: "Aktif",
+                pending: "Tertunda",
+                completed: "Selesai",
+                cancelled: "Dibatalkan",
+                todayCount: "Tempahan Hari Ini",
+                totalPax: "Jumlah Penumpang",
+                estEarnings: "Anggaran Pendapatan",
+                thisWeek: "Minggu Ini",
+                optional: "(Pilihan)"
+            }
+        };
+
+        // App State
+        const app = {
+            currentLanguage: 'en',
+            currentTab: 'today',
+            currentCalendarDate: new Date(),
+            bookings: [],
+            editingId: null,
+            
+            init() {
+                this.loadBookings();
+                this.setDefaultDateTime();
+                this.updateAllViews();
+                this.updateStats();
+                this.renderMiniCalendar();
+                this.setupEventListeners();
+                this.updateHeaderDate();
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js').catch(() => {});
+                }
+            },
+            
+            setupEventListeners() {
+                document.getElementById('bookingForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveBooking();
+                });
+                
+                document.getElementById('bookingModal').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        this.closeBookingModal();
+                    }
+                });
+            },
+            
+            setDefaultDateTime() {
+                const today = new Date();
+                document.getElementById('bookingDate').valueAsDate = today;
+                const time = new Date();
+                time.setHours(time.getHours() + 1);
+                document.getElementById('bookingTime').value = time.toTimeString().slice(0, 5);
+            },
+            
+            loadBookings() {
+                const stored = localStorage.getItem('grabBookings');
+                this.bookings = stored ? JSON.parse(stored) : [];
+            },
+            
+            saveBookingsToStorage() {
+                localStorage.setItem('grabBookings', JSON.stringify(this.bookings));
+            },
+            
+            showBookingModal() {
+                this.editingId = null;
+                document.getElementById('modalTitle').textContent = this.t('newBooking');
+                document.getElementById('bookingForm').reset();
+                this.setDefaultDateTime();
+                document.getElementById('bookingModal').classList.remove('hidden');
+            },
+            
+            closeBookingModal() {
+                document.getElementById('bookingModal').classList.add('hidden');
+                this.editingId = null;
+            },
+            
+            saveBooking() {
+                const booking = {
+                    id: this.editingId || Date.now().toString(),
+                    customerName: document.getElementById('customerName').value,
+                    pickupLocation: document.getElementById('pickupLocation').value,
+                    destination: document.getElementById('destination').value,
+                    pax: parseInt(document.getElementById('pax').value),
+                    fare: parseFloat(document.getElementById('fare').value) || 0,
+                    date: document.getElementById('bookingDate').value,
+                    time: document.getElementById('bookingTime').value,
+                    phone: document.getElementById('phone').value,
+                    notes: document.getElementById('notes').value,
+                    status: 'active',
+                    createdAt: this.editingId ? 
+                        this.bookings.find(b => b.id === this.editingId).createdAt : 
+                        new Date().toISOString()
+                };
+                
+                if (this.editingId) {
+                    const index = this.bookings.findIndex(b => b.id === this.editingId);
+                    this.bookings[index] = booking;
+                    this.showToast(this.t('bookingUpdated'), 'success');
+                } else {
+                    this.bookings.push(booking);
+                    this.showToast(this.t('bookingAdded'), 'success');
+                }
+                
+                this.saveBookingsToStorage();
+                this.updateAllViews();
+                this.updateStats();
+                this.closeBookingModal();
+            },
+            
+            editBooking(id) {
+                const booking = this.bookings.find(b => b.id === id);
+                if (!booking) return;
+                
+                this.editingId = id;
+                document.getElementById('modalTitle').textContent = this.t('editBooking');
+                document.getElementById('customerName').value = booking.customerName;
+                document.getElementById('pickupLocation').value = booking.pickupLocation;
+                document.getElementById('destination').value = booking.destination;
+                document.getElementById('pax').value = booking.pax;
+                document.getElementById('fare').value = booking.fare;
+                document.getElementById('bookingDate').value = booking.date;
+                document.getElementById('bookingTime').value = booking.time;
+                document.getElementById('phone').value = booking.phone;
+                document.getElementById('notes').value = booking.notes;
+                
+                document.getElementById('bookingModal').classList.remove('hidden');
+            },
+            
+            deleteBooking(id) {
+                if (confirm(this.t('deleteConfirm'))) {
+                    this.bookings = this.bookings.filter(b => b.id !== id);
+                    this.saveBookingsToStorage();
+                    this.updateAllViews();
+                    this.updateStats();
+                    this.showToast(this.t('bookingDeleted'), 'success');
+                }
+            },
+            
+            completeBooking(id) {
+                const booking = this.bookings.find(b => b.id === id);
+                if (booking) {
+                    booking.status = 'completed';
+                    this.saveBookingsToStorage();
+                    this.updateAllViews();
+                    this.updateStats();
+                    this.showToast(this.t('bookingCompleted'), 'success');
+                }
+            },
+            
+            switchTab(tab) {
+                this.currentTab = tab;
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`tab-${tab}`).classList.add('active');
+                
+                document.getElementById('todayView').classList.add('hidden');
+                document.getElementById('upcomingView').classList.add('hidden');
+                document.getElementById('calendarView').classList.add('hidden');
+                document.getElementById('historyView').classList.add('hidden');
+                
+                document.getElementById(`${tab}View`).classList.remove('hidden');
+                
+                if (tab === 'calendar') {
+                    this.renderCalendar();
+                }
+                
+                this.updateHeaderDate();
+            },
+            
+            updateHeaderDate() {
+                const today = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('headerDate').textContent = today.toLocaleDateString('en-US', options);
+            },
+            
+            updateAllViews() {
+                this.renderTodayBookings();
+                this.renderUpcomingBookings();
+                this.renderHistoryBookings();
+                this.renderMiniCalendar();
+            },
+            
+            renderTodayBookings() {
+                const today = this.getDateString(new Date());
+                const todayBookings = this.bookings.filter(b => b.date === today && b.status === 'active')
+                    .sort((a, b) => a.time.localeCompare(b.time));
+                
+                const container = document.getElementById('todayBookings');
+                const empty = document.getElementById('todayEmpty');
+                
+                if (todayBookings.length === 0) {
+                    container.innerHTML = '';
+                    empty.classList.remove('hidden');
+                } else {
+                    empty.classList.add('hidden');
+                    container.innerHTML = todayBookings.map(b => this.createBookingCard(b)).join('');
+                }
+            },
+            
+            renderUpcomingBookings() {
+                const today = this.getDateString(new Date());
+                const upcoming = this.bookings.filter(b => b.date > today && b.status === 'active')
+                    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+                
+                const container = document.getElementById('upcomingBookings');
+                const empty = document.getElementById('upcomingEmpty');
+                
+                if (upcoming.length === 0) {
+                    container.innerHTML = '';
+                    empty.classList.remove('hidden');
+                } else {
+                    empty.classList.add('hidden');
+                    
+                    let grouped = {};
+                    upcoming.forEach(b => {
+                        if (!grouped[b.date]) grouped[b.date] = [];
+                        grouped[b.date].push(b);
+                    });
+                    
+                    let html = '';
+                    Object.keys(grouped).sort().forEach(date => {
+                        html += `<div class="mb-6">
+                            <h4 class="text-sm font-semibold text-gray-600 mb-3">${this.formatDate(date)}</h4>
+                            <div class="space-y-3">
+                                ${grouped[date].map(b => this.createBookingCard(b)).join('')}
+                            </div>
+                        </div>`;
+                    });
+                    
+                    container.innerHTML = html;
+                }
+            },
+            
+            renderHistoryBookings() {
+                const history = this.bookings.filter(b => b.status === 'completed')
+                    .sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time))
+                    .reverse();
+                
+                const container = document.getElementById('historyBookings');
+                const empty = document.getElementById('historyEmpty');
+                
+                if (history.length === 0) {
+                    container.innerHTML = '';
+                    empty.classList.remove('hidden');
+                } else {
+                    empty.classList.add('hidden');
+                    container.innerHTML = history.map(b => this.createBookingCard(b, true)).join('');
+                }
+            },
+            
+            createBookingCard(booking, isHistory = false) {
+                const statusClass = booking.status === 'completed' ? 'status-completed' : 'status-active';
+                const statusText = booking.status === 'completed' ? this.t('completed') : this.t('active');
+                
+                return `
+                    <div class="bg-white rounded-lg p-4 card-hover fade-in ${booking.status === 'completed' ? 'opacity-75' : ''}">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold text-gray-900">${this.escapeHtml(booking.customerName)}</h4>
+                                    <span class="status-badge ${statusClass}">${booking.status === 'completed' ? '✓' : '●'}</span>
+                                </div>
+                                <p class="text-sm text-gray-600">${this.escapeHtml(booking.destination)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-gray-900">${booking.time}</p>
+                                <p class="text-sm text-gray-500">${booking.pax} ${this.t('pax_short')}</p>
+                            </div>
+                        </div>
+                        
+                        ${booking.pickupLocation ? `<p class="text-sm text-gray-600 mb-2">📍 ${this.escapeHtml(booking.pickupLocation)}</p>` : ''}
+                        
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex gap-4 text-sm text-gray-600">
+                                ${booking.fare ? `<span class="font-medium text-gray-900">RM ${booking.fare.toFixed(2)}</span>` : ''}
+                                ${booking.phone ? `<span>${this.escapeHtml(booking.phone)}</span>` : ''}
+                            </div>
+                        </div>
+                        
+                        ${booking.notes ? `<p class="text-sm text-gray-500 mb-3 italic">"${this.escapeHtml(booking.notes)}"</p>` : ''}
+                        
+                        <div class="flex gap-2 pt-3 border-t border-gray-100">
+                            ${!isHistory ? `
+                                <button onclick="app.editBooking('${booking.id}')" class="flex-1 btn btn-secondary btn-small">
+                                    ${this.t('edit')}
+                                </button>
+                                <button onclick="app.completeBooking('${booking.id}')" class="flex-1 btn btn-primary btn-small">
+                                    ${this.t('complete')}
+                                </button>
+                                <button onclick="app.deleteBooking('${booking.id}')" class="flex-1 btn btn-danger btn-small">
+                                    ${this.t('delete')}
+                                </button>
+                            ` : `
+                                <button onclick="app.deleteBooking('${booking.id}')" class="flex-1 btn btn-danger btn-small">
+                                    ${this.t('delete')}
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            },
+            
+            renderMiniCalendar() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay.getDay();
+                
+                let html = '';
+                
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    html += '<div class="calendar-day other-month"></div>';
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dateStr = this.getDateString(date);
+                    const isToday = dateStr === this.getDateString(new Date());
+                    const hasBookings = this.bookings.some(b => b.date === dateStr && b.status === 'active');
+                    
+                    let className = 'calendar-day';
+                    if (isToday) className += ' today';
+                    else if (hasBookings) className += ' selected';
+                    
+                    html += `<div class="${className}" onclick="app.selectCalendarDate('${dateStr}')">${day}</div>`;
+                }
+                
+                document.getElementById('miniCalendar').innerHTML = html;
+            },
+            
+            renderCalendar() {
+                const year = this.currentCalendarDate.getFullYear();
+                const month = this.currentCalendarDate.getMonth();
+                
+                document.getElementById('calendarMonth').textContent = 
+                    this.currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay.getDay();
+                
+                let html = '';
+                
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    html += '<div class="calendar-day other-month"></div>';
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dateStr = this.getDateString(date);
+                    const isToday = dateStr === this.getDateString(new Date());
+                    const bookingCount = this.bookings.filter(b => b.date === dateStr && b.status === 'active').length;
+                    
+                    let className = 'calendar-day';
+                    if (isToday) className += ' today';
+                    
+                    html += `<div class="${className}" onclick="app.selectCalendarDate('${dateStr}')">
+                        <div class="flex flex-col items-center">
+                            <span>${day}</span>
+                            ${bookingCount > 0 ? `<span class="text-xs font-bold text-grab-green">${bookingCount}</span>` : ''}
+                        </div>
+                    </div>`;
+                }
+                
+                document.getElementById('calendarGrid').innerHTML = html;
+                this.renderCalendarDetails();
+            },
+            
+            selectCalendarDate(dateStr) {
+                const bookings = this.bookings.filter(b => b.date === dateStr && b.status === 'active')
+                    .sort((a, b) => a.time.localeCompare(b.time));
+                
+                let html = '';
+                if (bookings.length > 0) {
+                    html += `<h4 class="text-lg font-semibold text-gray-900 mb-3">${this.formatDate(dateStr)}</h4>`;
+                    html += `<div class="space-y-3">${bookings.map(b => this.createBookingCard(b)).join('')}</div>`;
+                } else {
+                    html = `<div class="text-center py-8">
+                        <p class="text-gray-500">${this.t('noBookings')} on ${this.formatDate(dateStr)}</p>
+                    </div>`;
+                }
+                
+                document.getElementById('calendarDetails').innerHTML = html;
+            },
+            
+            renderCalendarDetails() {
+                const today = this.getDateString(new Date());
+                this.selectCalendarDate(today);
+            },
+            
+            previousMonth() {
+                this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() - 1);
+                this.renderCalendar();
+            },
+            
+            nextMonth() {
+                this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() + 1);
+                this.renderCalendar();
+            },
+            
+            todayMonth() {
+                this.currentCalendarDate = new Date();
+                this.renderCalendar();
+            },
+            
+            updateStats() {
+                const today = this.getDateString(new Date());
+                const thisWeek = this.getWeekStart(new Date());
+                
+                const todayBookings = this.bookings.filter(b => b.date === today && b.status === 'active');
+                const weekBookings = this.bookings.filter(b => {
+                    const bDate = new Date(b.date);
+                    return bDate >= thisWeek && b.status === 'active';
+                });
+                
+                const totalPax = todayBookings.reduce((sum, b) => sum + b.pax, 0);
+                const totalEarnings = todayBookings.reduce((sum, b) => sum + b.fare, 0);
+                const weekCount = weekBookings.length;
+                
+                document.getElementById('todayCount').textContent = todayBookings.length;
+                document.getElementById('totalPax').textContent = totalPax;
+                document.getElementById('totalEarnings').textContent = `RM ${totalEarnings.toFixed(2)}`;
+                document.getElementById('weekCount').textContent = weekCount;
+                
+                document.getElementById('mobileToday').textContent = todayBookings.length;
+                document.getElementById('mobilePax').textContent = totalPax;
+                document.getElementById('mobileEarnings').textContent = `RM ${totalEarnings.toFixed(2)}`;
+            },
+            
+            getDateString(date) {
+                return date.toISOString().split('T')[0];
+            },
+            
+            formatDate(dateStr) {
+                const date = new Date(dateStr + 'T00:00:00');
+                return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            },
+            
+            getWeekStart(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = d.getDate() - day;
+                return new Date(d.setDate(diff));
+            },
+            
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(20px)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            },
+            
+            toggleMobileMenu() {
+                document.getElementById('mobileMenu').classList.toggle('hidden');
+            },
+            
+            t(key) {
+                return translations[this.currentLanguage][key] || key;
+            },
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            
+            showLanguageMenu() {
+                this.currentLanguage = this.currentLanguage === 'en' ? 'bm' : 'en';
+                this.updateLanguage();
+            },
+            
+            updateLanguage() {
+                document.getElementById('labelCustomerName').textContent = this.t('customerName');
+                document.getElementById('labelPickupLocation').textContent = this.t('pickupLocation') + ' ' + this.t('optional');
+                document.getElementById('labelDestination').textContent = this.t('destination');
+                document.getElementById('labelPax').textContent = this.t('numberOfPax');
+                document.getElementById('labelFare').textContent = this.t('estimatedFare');
+                document.getElementById('labelDate').textContent = this.t('date');
+                document.getElementById('labelTime').textContent = this.t('time');
+                document.getElementById('labelPhone').textContent = this.t('phone') + ' ' + this.t('optional');
+                document.getElementById('labelNotes').textContent = this.t('notes') + ' ' + this.t('optional');
+                document.getElementById('btnCancel').textContent = this.t('cancel');
+                document.getElementById('btnSave').textContent = this.t('save');
+                
+                document.getElementById('langLabel').textContent = this.currentLanguage === 'en' ? 'English' : 'Bahasa Malaysia';
+                document.getElementById('langLabelBM').textContent = this.currentLanguage === 'en' ? 'Bahasa Malaysia' : 'English';
+                
+                this.updateAllViews();
+                this.updateStats();
+            }
+        };
+        
+        // Initialize app on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
