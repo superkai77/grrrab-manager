@@ -7,57 +7,297 @@
     <meta name="theme-color" content="#00B14F">
     <title>Grab Driver Booking Manager</title>
     <p style="text-align:center; font-size:13px; color:#666;">by superkai</p>
+    <!-- CRITICAL FIX: Tailwind CDN must be loaded as JavaScript, not CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%2300B14F' width='192' height='192'/><text x='50%' y='50%' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dy='.3em'>G</text></svg>">
     <style>
+        /* FALLBACK CSS: Essential styles if Tailwind CDN fails to load */
         * {
             -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #fafafa;
+            color: #1f2937;
+            font-size: 16px;
+            line-height: 1.5;
         }
         
-        .grab-green {
-            color: #00B14F;
+        /* Main layout */
+        .flex {
+            display: flex;
         }
         
-        .grab-green-bg {
+        .flex-col {
+            flex-direction: column;
+        }
+        
+        .flex-1 {
+            flex: 1;
+        }
+        
+        .h-screen {
+            height: 100vh;
+        }
+        
+        .overflow-hidden {
+            overflow: hidden;
+        }
+        
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+        
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 16rem;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .hidden.md\:block {
+                display: none !important;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .md\:block {
+                display: block !important;
+            }
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Sticky Header - CRITICAL: Must be visible on mobile */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sticky-header .flex {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Mobile brand title - CRITICAL: Show on mobile */
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-brand {
+                display: flex;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-brand {
+                display: none;
+            }
+        }
+        
+        .brand-logo {
+            width: 2.5rem;
+            height: 2.5rem;
             background-color: #00B14F;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
         
-        .grab-green-border {
-            border-color: #00B14F;
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
         
-        .grab-green-text-hover:hover {
-            color: #009640;
+        .brand-text h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
         }
         
-        .accent-line {
-            border-left: 3px solid #00B14F;
+        .brand-text p {
+            margin: 0;
+            padding: 0;
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1;
         }
         
-        .card-hover {
+        /* Header title */
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-title h2 {
+            margin: 0;
+            padding: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .header-title p {
+            margin: 0;
+            padding: 0;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
             transition: all 0.2s ease;
+            font-size: 1rem;
         }
         
-        .card-hover:hover {
+        .btn-primary {
+            background-color: #00B14F;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #009640;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-danger {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background-color: #fecaca;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Tabs */
+        .tab-button {
+            padding: 0.75rem 1rem;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .tab-button.active {
+            color: #00B14F;
+            border-bottom-color: #00B14F;
+        }
+        
+        /* Input fields */
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #00B14F;
+            box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.1);
+        }
+        
+        /* Booking cards */
+        .booking-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            margin-bottom: 0.75rem;
+        }
+        
+        .booking-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transform: translateY(-1px);
         }
         
+        /* Status badge */
         .status-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
+            width: 1.5rem;
+            height: 1.5rem;
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
+            flex-shrink: 0;
         }
         
         .status-active {
@@ -65,76 +305,20 @@
             color: white;
         }
         
-        .status-pending {
-            background-color: #FBBF24;
-            color: #78350F;
-        }
-        
         .status-completed {
-            background-color: #D1D5DB;
+            background-color: #d1d5db;
             color: #374151;
         }
         
-        .status-cancelled {
-            background-color: #EF4444;
-            color: white;
+        /* Empty state SVGs */
+        svg.empty-state-icon {
+            max-width: 80px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 1rem;
         }
         
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .slide-up {
-            animation: slideUp 0.3s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            animation: slideUp 0.3s ease-out;
-            max-width: 90%;
-        }
-        
-        .toast.success {
-            border-left: 4px solid #00B14F;
-        }
-        
-        .toast.error {
-            border-left: 4px solid #EF4444;
-        }
-        
-        .toast.info {
-            border-left: 4px solid #3B82F6;
-        }
-        
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -153,8 +337,8 @@
         
         .modal-content {
             background: white;
-            border-radius: 16px 16px 0 0;
-            padding: 24px;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -167,16 +351,17 @@
             }
             
             .modal-content {
-                border-radius: 16px;
+                border-radius: 1rem;
                 width: 90%;
                 max-width: 500px;
             }
         }
         
+        /* Calendar */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 0.5rem;
         }
         
         .calendar-day {
@@ -184,14 +369,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
         
         .calendar-day:hover {
-            background-color: #E5E7EB;
+            background-color: #e5e7eb;
         }
         
         .calendar-day.today {
@@ -200,132 +385,430 @@
             font-weight: 600;
         }
         
-        .calendar-day.selected {
-            background-color: #DBEAFE;
-            color: #1E40AF;
-            font-weight: 600;
-        }
-        
         .calendar-day.other-month {
-            color: #D1D5DB;
+            color: #d1d5db;
         }
         
-        .tab-button {
-            padding: 12px 16px;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            color: #6B7280;
-        }
-        
-        .tab-button.active {
-            color: #00B14F;
-            border-bottom-color: #00B14F;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #00B14F;
-            box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.1);
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-        
-        .btn-primary {
-            background-color: #00B14F;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #009640;
-        }
-        
-        .btn-secondary {
-            background-color: #F3F4F6;
-            color: #374151;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #E5E7EB;
-        }
-        
-        .btn-danger {
-            background-color: #FEE2E2;
-            color: #DC2626;
-        }
-        
-        .btn-danger:hover {
-            background-color: #FECACA;
-        }
-        
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 14px;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
+        /* Sidebar stats */
         .sidebar-stat {
-            padding: 16px;
+            padding: 1rem;
             background: white;
-            border-radius: 12px;
-            margin-bottom: 12px;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .stat-label {
-            font-size: 12px;
-            color: #6B7280;
+            font-size: 0.75rem;
+            color: #6b7280;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #1F2937;
-            margin-top: 4px;
+            color: #1f2937;
+            margin-top: 0.25rem;
         }
         
         .stat-value.grab-green {
             color: #00B14F;
         }
         
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .grab-green {
+            color: #00B14F;
+        }
+        
+        .grab-green-bg {
+            background-color: #00B14F;
+        }
+        
+        .grab-green-border {
+            border-color: #00B14F;
+        }
+        
+        .accent-line {
+            border-left: 3px solid #00B14F;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            background: white;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+            max-width: 90%;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #00B14F;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: none;
+        }
+        
+        .mobile-menu.hidden {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+        
+        .mobile-menu.show {
+            display: flex;
+        }
+        
+        .mobile-menu-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .mobile-menu-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 16rem;
+            background: white;
+            overflow-y: auto;
+        }
+        
+        /* Hamburger menu button */
+        .menu-button {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        .menu-button:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .menu-button svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+        
+        /* Content area spacing */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .content-area {
+                padding: 1.5rem 2rem;
+            }
+        }
+        
+        /* Grid layouts */
+        .grid {
+            display: grid;
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .grid-cols-7 {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+        
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        
+        .gap-3 {
+            gap: 0.75rem;
+        }
+        
+        .gap-4 {
+            gap: 1rem;
+        }
+        
+        /* Spacing */
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .mt-4 {
+            margin-top: 1rem;
+        }
+        
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+        
+        .p-2 {
+            padding: 0.5rem;
+        }
+        
+        .p-4 {
+            padding: 1rem;
+        }
+        
+        .p-6 {
+            padding: 1.5rem;
+        }
+        
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .px-8 {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .py-6 {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        
+        .py-12 {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+        
+        /* Text styles */
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .text-lg {
+            font-size: 1.125rem;
+        }
+        
+        .text-xl {
+            font-size: 1.25rem;
+        }
+        
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+        
+        .font-bold {
+            font-weight: 700;
+        }
+        
+        .font-semibold {
+            font-weight: 600;
+        }
+        
+        .font-medium {
+            font-weight: 500;
+        }
+        
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+        
+        .text-gray-500 {
+            color: #6b7280;
+        }
+        
+        .text-gray-600 {
+            color: #4b5563;
+        }
+        
+        .text-gray-700 {
+            color: #374151;
+        }
+        
+        .text-gray-900 {
+            color: #111827;
+        }
+        
+        .bg-white {
+            background-color: white;
+        }
+        
+        .bg-gray-50 {
+            background-color: #fafafa;
+        }
+        
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+        
+        .border-b {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .border-r {
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .border-gray-200 {
+            border-color: #e5e7eb;
+        }
+        
+        .rounded {
+            border-radius: 0.25rem;
+        }
+        
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .w-64 {
+            width: 16rem;
+        }
+        
+        .w-10 {
+            width: 2.5rem;
+        }
+        
+        .w-16 {
+            width: 4rem;
+        }
+        
+        .w-6 {
+            width: 1.5rem;
+        }
+        
+        .h-10 {
+            height: 2.5rem;
+        }
+        
+        .h-16 {
+            height: 4rem;
+        }
+        
+        .h-6 {
+            height: 1.5rem;
+        }
+        
+        .h-screen {
+            height: 100vh;
+        }
+        
+        .max-w-6xl {
+            max-width: 72rem;
+        }
+        
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Responsive utilities */
+        @media (max-width: 640px) {
+            .hidden.sm\:inline {
+                display: none !important;
             }
             
-            .main-content {
-                width: 100%;
+            .sm\:hidden {
+                display: none !important;
+            }
+        }
+        
+        @media (min-width: 641px) {
+            .sm\:inline {
+                display: inline !important;
+            }
+            
+            .sm\:hidden {
+                display: none !important;
             }
         }
     </style>
@@ -381,16 +864,25 @@
         <!-- Main Content -->
         <div class="main-content flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="sticky-header px-4 md:px-8 py-4 flex items-center justify-between">
+            <div class="sticky-header">
                 <div class="flex items-center gap-4">
-                    <button onclick="app.toggleMobileMenu()" class="md:hidden p-2 hover:bg-gray-100 rounded-lg">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onclick="app.toggleMobileMenu()" class="menu-button md:hidden">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900" id="headerTitle">Today's Bookings</h2>
-                        <p class="text-sm text-gray-500" id="headerDate"></p>
+                    <!-- CRITICAL FIX: Mobile brand title now visible on mobile -->
+                    <div class="mobile-brand">
+                        <div class="brand-logo">G</div>
+                        <div class="brand-text">
+                            <h1>Grab Driver</h1>
+                            <p>Booking Manager</p>
+                        </div>
+                    </div>
+                    <!-- Desktop header title -->
+                    <div class="header-title hidden md:block">
+                        <h2 id="headerTitle">Today's Bookings</h2>
+                        <p id="headerDate"></p>
                     </div>
                 </div>
                 <button onclick="app.showBookingModal()" class="btn btn-primary">
@@ -416,7 +908,7 @@
                 <div id="todayView" class="space-y-4">
                     <div id="todayBookings" class="space-y-3"></div>
                     <div id="todayEmpty" class="text-center py-12">
-                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <p class="text-gray-500 text-lg">No bookings for today</p>
@@ -428,7 +920,7 @@
                 <div id="upcomingView" class="hidden space-y-4">
                     <div id="upcomingBookings" class="space-y-3"></div>
                     <div id="upcomingEmpty" class="text-center py-12">
-                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <p class="text-gray-500 text-lg">No upcoming bookings</p>
@@ -466,7 +958,7 @@
                 <div id="historyView" class="hidden space-y-4">
                     <div id="historyBookings" class="space-y-3"></div>
                     <div id="historyEmpty" class="text-center py-12">
-                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <p class="text-gray-500 text-lg">No completed bookings yet</p>
@@ -491,17 +983,17 @@
             <form id="bookingForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2" id="labelCustomerName">Customer Name</label>
-                    <input type="text" id="customerName" class="input-field" placeholder="e.g., Radin Mustakim" required>
+                    <input type="text" id="customerName" class="input-field" placeholder="e.g., Ahmad Hassan" required>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2" id="labelPickupLocation">Pickup Location (Optional)</label>
-                    <input type="text" id="pickupLocation" class="input-field" placeholder="e.g., Target Baru">
+                    <input type="text" id="pickupLocation" class="input-field" placeholder="e.g., Pavilion KL">
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2" id="labelDestination">Destination</label>
-                    <input type="text" id="destination" class="input-field" placeholder="e.g., Perwira" required>
+                    <input type="text" id="destination" class="input-field" placeholder="e.g., Petronas Twin Towers" required>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -545,9 +1037,9 @@
     </div>
     
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="hidden fixed inset-0 z-40 md:hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="app.toggleMobileMenu()"></div>
-        <div class="absolute left-0 top-0 bottom-0 w-64 bg-white overflow-y-auto">
+    <div id="mobileMenu" class="mobile-menu hidden md:hidden">
+        <div class="mobile-menu-backdrop" onclick="app.toggleMobileMenu()"></div>
+        <div class="mobile-menu-content">
             <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center gap-2 mb-6">
                     <div class="w-10 h-10 grab-green-bg rounded-lg flex items-center justify-center text-white font-bold text-lg">G</div>
@@ -709,25 +1201,12 @@
                 this.bookings = stored ? JSON.parse(stored) : [];
             },
             
-            saveBookingsToStorage() {
+            saveBookings() {
                 localStorage.setItem('grabBookings', JSON.stringify(this.bookings));
             },
             
-            showBookingModal() {
-                this.editingId = null;
-                document.getElementById('modalTitle').textContent = this.t('newBooking');
-                document.getElementById('bookingForm').reset();
-                this.setDefaultDateTime();
-                document.getElementById('bookingModal').classList.remove('hidden');
-            },
-            
-            closeBookingModal() {
-                document.getElementById('bookingModal').classList.add('hidden');
-                this.editingId = null;
-            },
-            
             saveBooking() {
-                const booking = {
+                const formData = {
                     id: this.editingId || Date.now().toString(),
                     customerName: document.getElementById('customerName').value,
                     pickupLocation: document.getElementById('pickupLocation').value,
@@ -738,53 +1217,35 @@
                     time: document.getElementById('bookingTime').value,
                     phone: document.getElementById('phone').value,
                     notes: document.getElementById('notes').value,
-                    status: 'active',
-                    createdAt: this.editingId ? 
-                        this.bookings.find(b => b.id === this.editingId).createdAt : 
-                        new Date().toISOString()
+                    status: this.editingId ? (this.bookings.find(b => b.id === this.editingId)?.status || 'active') : 'active',
+                    createdAt: this.editingId ? (this.bookings.find(b => b.id === this.editingId)?.createdAt || new Date().toISOString()) : new Date().toISOString()
                 };
                 
                 if (this.editingId) {
                     const index = this.bookings.findIndex(b => b.id === this.editingId);
-                    this.bookings[index] = booking;
-                    this.showToast(this.t('bookingUpdated'), 'success');
+                    if (index !== -1) {
+                        this.bookings[index] = formData;
+                        this.showToast(translations[this.currentLanguage].bookingUpdated, 'success');
+                    }
+                    this.editingId = null;
                 } else {
-                    this.bookings.push(booking);
-                    this.showToast(this.t('bookingAdded'), 'success');
+                    this.bookings.push(formData);
+                    this.showToast(translations[this.currentLanguage].bookingAdded, 'success');
                 }
                 
-                this.saveBookingsToStorage();
+                this.saveBookings();
+                this.closeBookingModal();
                 this.updateAllViews();
                 this.updateStats();
-                this.closeBookingModal();
-            },
-            
-            editBooking(id) {
-                const booking = this.bookings.find(b => b.id === id);
-                if (!booking) return;
-                
-                this.editingId = id;
-                document.getElementById('modalTitle').textContent = this.t('editBooking');
-                document.getElementById('customerName').value = booking.customerName;
-                document.getElementById('pickupLocation').value = booking.pickupLocation;
-                document.getElementById('destination').value = booking.destination;
-                document.getElementById('pax').value = booking.pax;
-                document.getElementById('fare').value = booking.fare;
-                document.getElementById('bookingDate').value = booking.date;
-                document.getElementById('bookingTime').value = booking.time;
-                document.getElementById('phone').value = booking.phone;
-                document.getElementById('notes').value = booking.notes;
-                
-                document.getElementById('bookingModal').classList.remove('hidden');
             },
             
             deleteBooking(id) {
-                if (confirm(this.t('deleteConfirm'))) {
+                if (confirm(translations[this.currentLanguage].deleteConfirm)) {
                     this.bookings = this.bookings.filter(b => b.id !== id);
-                    this.saveBookingsToStorage();
+                    this.saveBookings();
+                    this.showToast(translations[this.currentLanguage].bookingDeleted, 'success');
                     this.updateAllViews();
                     this.updateStats();
-                    this.showToast(this.t('bookingDeleted'), 'success');
                 }
             },
             
@@ -792,16 +1253,57 @@
                 const booking = this.bookings.find(b => b.id === id);
                 if (booking) {
                     booking.status = 'completed';
-                    this.saveBookingsToStorage();
+                    this.saveBookings();
+                    this.showToast(translations[this.currentLanguage].bookingCompleted, 'success');
                     this.updateAllViews();
                     this.updateStats();
-                    this.showToast(this.t('bookingCompleted'), 'success');
                 }
+            },
+            
+            editBooking(id) {
+                const booking = this.bookings.find(b => b.id === id);
+                if (booking) {
+                    this.editingId = id;
+                    document.getElementById('customerName').value = booking.customerName;
+                    document.getElementById('pickupLocation').value = booking.pickupLocation;
+                    document.getElementById('destination').value = booking.destination;
+                    document.getElementById('pax').value = booking.pax;
+                    document.getElementById('fare').value = booking.fare;
+                    document.getElementById('bookingDate').value = booking.date;
+                    document.getElementById('bookingTime').value = booking.time;
+                    document.getElementById('phone').value = booking.phone;
+                    document.getElementById('notes').value = booking.notes;
+                    document.getElementById('modalTitle').textContent = translations[this.currentLanguage].editBooking;
+                    document.getElementById('btnSave').textContent = translations[this.currentLanguage].save;
+                    this.showBookingModal();
+                }
+            },
+            
+            showBookingModal() {
+                if (!this.editingId) {
+                    document.getElementById('bookingForm').reset();
+                    document.getElementById('modalTitle').textContent = translations[this.currentLanguage].newBooking;
+                    document.getElementById('btnSave').textContent = translations[this.currentLanguage].save;
+                    this.setDefaultDateTime();
+                }
+                document.getElementById('bookingModal').classList.remove('hidden');
+            },
+            
+            closeBookingModal() {
+                document.getElementById('bookingModal').classList.add('hidden');
+                this.editingId = null;
+                document.getElementById('bookingForm').reset();
+            },
+            
+            toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('hidden');
+                menu.classList.toggle('show');
             },
             
             switchTab(tab) {
                 this.currentTab = tab;
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('[id^="tab-"]').forEach(btn => btn.classList.remove('active'));
                 document.getElementById(`tab-${tab}`).classList.add('active');
                 
                 document.getElementById('todayView').classList.add('hidden');
@@ -809,143 +1311,105 @@
                 document.getElementById('calendarView').classList.add('hidden');
                 document.getElementById('historyView').classList.add('hidden');
                 
-                document.getElementById(`${tab}View`).classList.remove('hidden');
-                
-                if (tab === 'calendar') {
-                    this.renderCalendar();
+                if (tab === 'today') {
+                    document.getElementById('todayView').classList.remove('hidden');
+                    document.getElementById('headerTitle').textContent = translations[this.currentLanguage].todayBookings;
+                } else if (tab === 'upcoming') {
+                    document.getElementById('upcomingView').classList.remove('hidden');
+                    document.getElementById('headerTitle').textContent = translations[this.currentLanguage].upcomingBookings;
+                } else if (tab === 'calendar') {
+                    document.getElementById('calendarView').classList.remove('hidden');
+                    document.getElementById('headerTitle').textContent = 'Calendar';
+                } else if (tab === 'history') {
+                    document.getElementById('historyView').classList.remove('hidden');
+                    document.getElementById('headerTitle').textContent = translations[this.currentLanguage].completedBookings;
                 }
-                
-                this.updateHeaderDate();
-            },
-            
-            updateHeaderDate() {
-                const today = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('headerDate').textContent = today.toLocaleDateString('en-US', options);
             },
             
             updateAllViews() {
                 this.renderTodayBookings();
                 this.renderUpcomingBookings();
                 this.renderHistoryBookings();
-                this.renderMiniCalendar();
+                this.renderCalendar();
             },
             
             renderTodayBookings() {
-                const today = this.getDateString(new Date());
-                const todayBookings = this.bookings.filter(b => b.date === today && b.status === 'active')
-                    .sort((a, b) => a.time.localeCompare(b.time));
+                const today = new Date().toISOString().split('T')[0];
+                const todayBookings = this.bookings.filter(b => b.date === today && b.status !== 'completed').sort((a, b) => a.time.localeCompare(b.time));
                 
                 const container = document.getElementById('todayBookings');
-                const empty = document.getElementById('todayEmpty');
+                container.innerHTML = todayBookings.map(b => this.renderBookingCard(b)).join('');
                 
-                if (todayBookings.length === 0) {
-                    container.innerHTML = '';
-                    empty.classList.remove('hidden');
-                } else {
-                    empty.classList.add('hidden');
-                    container.innerHTML = todayBookings.map(b => this.createBookingCard(b)).join('');
-                }
+                document.getElementById('todayEmpty').style.display = todayBookings.length === 0 ? 'block' : 'none';
             },
             
             renderUpcomingBookings() {
-                const today = this.getDateString(new Date());
-                const upcoming = this.bookings.filter(b => b.date > today && b.status === 'active')
-                    .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+                const today = new Date().toISOString().split('T')[0];
+                const upcomingBookings = this.bookings.filter(b => b.date > today && b.status !== 'completed').sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
                 
                 const container = document.getElementById('upcomingBookings');
-                const empty = document.getElementById('upcomingEmpty');
+                container.innerHTML = upcomingBookings.map(b => this.renderBookingCard(b)).join('');
                 
-                if (upcoming.length === 0) {
-                    container.innerHTML = '';
-                    empty.classList.remove('hidden');
-                } else {
-                    empty.classList.add('hidden');
-                    
-                    let grouped = {};
-                    upcoming.forEach(b => {
-                        if (!grouped[b.date]) grouped[b.date] = [];
-                        grouped[b.date].push(b);
-                    });
-                    
-                    let html = '';
-                    Object.keys(grouped).sort().forEach(date => {
-                        html += `<div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-600 mb-3">${this.formatDate(date)}</h4>
-                            <div class="space-y-3">
-                                ${grouped[date].map(b => this.createBookingCard(b)).join('')}
-                            </div>
-                        </div>`;
-                    });
-                    
-                    container.innerHTML = html;
-                }
+                document.getElementById('upcomingEmpty').style.display = upcomingBookings.length === 0 ? 'block' : 'none';
             },
             
             renderHistoryBookings() {
-                const history = this.bookings.filter(b => b.status === 'completed')
-                    .sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time))
-                    .reverse();
+                const historyBookings = this.bookings.filter(b => b.status === 'completed').sort((a, b) => new Date(b.date) - new Date(a.date));
                 
                 const container = document.getElementById('historyBookings');
-                const empty = document.getElementById('historyEmpty');
+                container.innerHTML = historyBookings.map(b => this.renderBookingCard(b, true)).join('');
                 
-                if (history.length === 0) {
-                    container.innerHTML = '';
-                    empty.classList.remove('hidden');
-                } else {
-                    empty.classList.add('hidden');
-                    container.innerHTML = history.map(b => this.createBookingCard(b, true)).join('');
-                }
+                document.getElementById('historyEmpty').style.display = historyBookings.length === 0 ? 'block' : 'none';
             },
             
-            createBookingCard(booking, isHistory = false) {
+            renderBookingCard(booking, isHistory = false) {
+                const statusIcon = booking.status === 'completed' ? '✓' : '●';
                 const statusClass = booking.status === 'completed' ? 'status-completed' : 'status-active';
-                const statusText = booking.status === 'completed' ? this.t('completed') : this.t('active');
                 
                 return `
-                    <div class="bg-white rounded-lg p-4 card-hover fade-in ${booking.status === 'completed' ? 'opacity-75' : ''}">
+                    <div class="booking-card fade-in">
                         <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h4 class="font-semibold text-gray-900">${this.escapeHtml(booking.customerName)}</h4>
-                                    <span class="status-badge ${statusClass}">${booking.status === 'completed' ? '✓' : '●'}</span>
+                            <div class="flex items-start gap-3 flex-1">
+                                <div class="status-badge ${statusClass}">${statusIcon}</div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">${booking.customerName}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">${booking.destination}</p>
                                 </div>
-                                <p class="text-sm text-gray-600">${this.escapeHtml(booking.destination)}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-semibold text-gray-900">${booking.time}</p>
-                                <p class="text-sm text-gray-500">${booking.pax} ${this.t('pax_short')}</p>
                             </div>
                         </div>
                         
-                        ${booking.pickupLocation ? `<p class="text-sm text-gray-600 mb-2">📍 ${this.escapeHtml(booking.pickupLocation)}</p>` : ''}
-                        
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex gap-4 text-sm text-gray-600">
-                                ${booking.fare ? `<span class="font-medium text-gray-900">RM ${booking.fare.toFixed(2)}</span>` : ''}
-                                ${booking.phone ? `<span>${this.escapeHtml(booking.phone)}</span>` : ''}
+                        <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+                            <div>
+                                <span class="text-gray-500">${translations[this.currentLanguage].time_short}:</span>
+                                <span class="font-medium text-gray-900 ml-1">${booking.time}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">${translations[this.currentLanguage].pax_short}:</span>
+                                <span class="font-medium text-gray-900 ml-1">${booking.pax}</span>
                             </div>
                         </div>
                         
-                        ${booking.notes ? `<p class="text-sm text-gray-500 mb-3 italic">"${this.escapeHtml(booking.notes)}"</p>` : ''}
+                        ${booking.pickupLocation ? `<div class="text-sm text-gray-600 mb-2">📍 ${booking.pickupLocation}</div>` : ''}
                         
-                        <div class="flex gap-2 pt-3 border-t border-gray-100">
+                        <div class="flex items-center justify-between text-sm mb-3">
+                            <span class="font-medium text-gray-900">RM ${booking.fare.toFixed(2)}</span>
+                            ${booking.phone ? `<span class="text-gray-600">${booking.phone}</span>` : ''}
+                        </div>
+                        
+                        ${booking.notes ? `<div class="text-xs text-gray-500 mb-3 italic">"${booking.notes}"</div>` : ''}
+                        
+                        <div class="flex gap-2">
                             ${!isHistory ? `
-                                <button onclick="app.editBooking('${booking.id}')" class="flex-1 btn btn-secondary btn-small">
-                                    ${this.t('edit')}
+                                <button onclick="app.editBooking('${booking.id}')" class="btn btn-secondary btn-small flex-1">
+                                    ${translations[this.currentLanguage].edit}
                                 </button>
-                                <button onclick="app.completeBooking('${booking.id}')" class="flex-1 btn btn-primary btn-small">
-                                    ${this.t('complete')}
+                                <button onclick="app.completeBooking('${booking.id}')" class="btn btn-primary btn-small flex-1">
+                                    ${translations[this.currentLanguage].complete}
                                 </button>
-                                <button onclick="app.deleteBooking('${booking.id}')" class="flex-1 btn btn-danger btn-small">
-                                    ${this.t('delete')}
-                                </button>
-                            ` : `
-                                <button onclick="app.deleteBooking('${booking.id}')" class="flex-1 btn btn-danger btn-small">
-                                    ${this.t('delete')}
-                                </button>
-                            `}
+                            ` : ''}
+                            <button onclick="app.deleteBooking('${booking.id}')" class="btn btn-danger btn-small flex-1">
+                                ${translations[this.currentLanguage].delete}
+                            </button>
                         </div>
                     </div>
                 `;
@@ -962,22 +1426,16 @@
                 const startingDayOfWeek = firstDay.getDay();
                 
                 let html = '';
-                
                 for (let i = 0; i < startingDayOfWeek; i++) {
-                    html += '<div class="calendar-day other-month"></div>';
+                    html += '<div></div>';
                 }
                 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const dateStr = this.getDateString(date);
-                    const isToday = dateStr === this.getDateString(new Date());
-                    const hasBookings = this.bookings.some(b => b.date === dateStr && b.status === 'active');
+                    const date = new Date(year, month, day).toISOString().split('T')[0];
+                    const hasBooking = this.bookings.some(b => b.date === date && b.status !== 'completed');
+                    const isToday = date === today.toISOString().split('T')[0];
                     
-                    let className = 'calendar-day';
-                    if (isToday) className += ' today';
-                    else if (hasBookings) className += ' selected';
-                    
-                    html += `<div class="${className}" onclick="app.selectCalendarDate('${dateStr}')">${day}</div>`;
+                    html += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasBooking ? 'grab-green-bg text-white' : ''}">${day}</div>`;
                 }
                 
                 document.getElementById('miniCalendar').innerHTML = html;
@@ -987,8 +1445,7 @@
                 const year = this.currentCalendarDate.getFullYear();
                 const month = this.currentCalendarDate.getMonth();
                 
-                document.getElementById('calendarMonth').textContent = 
-                    this.currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                document.getElementById('calendarMonth').textContent = this.currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                 
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
@@ -996,52 +1453,24 @@
                 const startingDayOfWeek = firstDay.getDay();
                 
                 let html = '';
-                
                 for (let i = 0; i < startingDayOfWeek; i++) {
                     html += '<div class="calendar-day other-month"></div>';
                 }
                 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const dateStr = this.getDateString(date);
-                    const isToday = dateStr === this.getDateString(new Date());
-                    const bookingCount = this.bookings.filter(b => b.date === dateStr && b.status === 'active').length;
+                    const date = new Date(year, month, day).toISOString().split('T')[0];
+                    const hasBooking = this.bookings.some(b => b.date === date);
+                    const isToday = date === new Date().toISOString().split('T')[0];
                     
-                    let className = 'calendar-day';
-                    if (isToday) className += ' today';
-                    
-                    html += `<div class="${className}" onclick="app.selectCalendarDate('${dateStr}')">
-                        <div class="flex flex-col items-center">
-                            <span>${day}</span>
-                            ${bookingCount > 0 ? `<span class="text-xs font-bold text-grab-green">${bookingCount}</span>` : ''}
-                        </div>
-                    </div>`;
+                    html += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasBooking ? 'grab-green-bg text-white' : ''}">${day}</div>`;
                 }
                 
                 document.getElementById('calendarGrid').innerHTML = html;
-                this.renderCalendarDetails();
-            },
-            
-            selectCalendarDate(dateStr) {
-                const bookings = this.bookings.filter(b => b.date === dateStr && b.status === 'active')
-                    .sort((a, b) => a.time.localeCompare(b.time));
                 
-                let html = '';
-                if (bookings.length > 0) {
-                    html += `<h4 class="text-lg font-semibold text-gray-900 mb-3">${this.formatDate(dateStr)}</h4>`;
-                    html += `<div class="space-y-3">${bookings.map(b => this.createBookingCard(b)).join('')}</div>`;
-                } else {
-                    html = `<div class="text-center py-8">
-                        <p class="text-gray-500">${this.t('noBookings')} on ${this.formatDate(dateStr)}</p>
-                    </div>`;
-                }
+                const calendarDetails = document.getElementById('calendarDetails');
+                const bookingsThisMonth = this.bookings.filter(b => b.date.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`)).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
                 
-                document.getElementById('calendarDetails').innerHTML = html;
-            },
-            
-            renderCalendarDetails() {
-                const today = this.getDateString(new Date());
-                this.selectCalendarDate(today);
+                calendarDetails.innerHTML = bookingsThisMonth.map(b => this.renderBookingCard(b)).join('');
             },
             
             previousMonth() {
@@ -1060,43 +1489,34 @@
             },
             
             updateStats() {
-                const today = this.getDateString(new Date());
-                const thisWeek = this.getWeekStart(new Date());
+                const today = new Date().toISOString().split('T')[0];
+                const todayBookings = this.bookings.filter(b => b.date === today && b.status !== 'completed');
+                const totalPax = this.bookings.reduce((sum, b) => b.status !== 'completed' ? sum + b.pax : sum, 0);
+                const totalEarnings = this.bookings.reduce((sum, b) => b.status !== 'completed' ? sum + b.fare : sum, 0);
                 
-                const todayBookings = this.bookings.filter(b => b.date === today && b.status === 'active');
+                const weekStart = new Date(today);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                
                 const weekBookings = this.bookings.filter(b => {
                     const bDate = new Date(b.date);
-                    return bDate >= thisWeek && b.status === 'active';
-                });
-                
-                const totalPax = todayBookings.reduce((sum, b) => sum + b.pax, 0);
-                const totalEarnings = todayBookings.reduce((sum, b) => sum + b.fare, 0);
-                const weekCount = weekBookings.length;
+                    return bDate >= weekStart && bDate <= weekEnd && b.status !== 'completed';
+                }).length;
                 
                 document.getElementById('todayCount').textContent = todayBookings.length;
                 document.getElementById('totalPax').textContent = totalPax;
                 document.getElementById('totalEarnings').textContent = `RM ${totalEarnings.toFixed(2)}`;
-                document.getElementById('weekCount').textContent = weekCount;
+                document.getElementById('weekCount').textContent = weekBookings;
                 
                 document.getElementById('mobileToday').textContent = todayBookings.length;
                 document.getElementById('mobilePax').textContent = totalPax;
                 document.getElementById('mobileEarnings').textContent = `RM ${totalEarnings.toFixed(2)}`;
             },
             
-            getDateString(date) {
-                return date.toISOString().split('T')[0];
-            },
-            
-            formatDate(dateStr) {
-                const date = new Date(dateStr + 'T00:00:00');
-                return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            },
-            
-            getWeekStart(date) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = d.getDate() - day;
-                return new Date(d.setDate(diff));
+            updateHeaderDate() {
+                const today = new Date();
+                document.getElementById('headerDate').textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             },
             
             showToast(message, type = 'info') {
@@ -1106,25 +1526,8 @@
                 document.body.appendChild(toast);
                 
                 setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(20px)';
-                    toast.style.transition = 'all 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
+                    toast.remove();
                 }, 3000);
-            },
-            
-            toggleMobileMenu() {
-                document.getElementById('mobileMenu').classList.toggle('hidden');
-            },
-            
-            t(key) {
-                return translations[this.currentLanguage][key] || key;
-            },
-            
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
             },
             
             showLanguageMenu() {
@@ -1133,27 +1536,24 @@
             },
             
             updateLanguage() {
-                document.getElementById('labelCustomerName').textContent = this.t('customerName');
-                document.getElementById('labelPickupLocation').textContent = this.t('pickupLocation') + ' ' + this.t('optional');
-                document.getElementById('labelDestination').textContent = this.t('destination');
-                document.getElementById('labelPax').textContent = this.t('numberOfPax');
-                document.getElementById('labelFare').textContent = this.t('estimatedFare');
-                document.getElementById('labelDate').textContent = this.t('date');
-                document.getElementById('labelTime').textContent = this.t('time');
-                document.getElementById('labelPhone').textContent = this.t('phone') + ' ' + this.t('optional');
-                document.getElementById('labelNotes').textContent = this.t('notes') + ' ' + this.t('optional');
-                document.getElementById('btnCancel').textContent = this.t('cancel');
-                document.getElementById('btnSave').textContent = this.t('save');
+                const t = translations[this.currentLanguage];
+                document.getElementById('labelCustomerName').textContent = t.customerName;
+                document.getElementById('labelPickupLocation').textContent = t.pickupLocation + ' ' + t.optional;
+                document.getElementById('labelDestination').textContent = t.destination;
+                document.getElementById('labelPax').textContent = t.numberOfPax;
+                document.getElementById('labelFare').textContent = t.estimatedFare;
+                document.getElementById('labelDate').textContent = t.date;
+                document.getElementById('labelTime').textContent = t.time;
+                document.getElementById('labelPhone').textContent = t.phone + ' ' + t.optional;
+                document.getElementById('labelNotes').textContent = t.notes + ' ' + t.optional;
+                document.getElementById('btnCancel').textContent = t.cancel;
+                document.getElementById('btnSave').textContent = t.save;
                 
                 document.getElementById('langLabel').textContent = this.currentLanguage === 'en' ? 'English' : 'Bahasa Malaysia';
-                document.getElementById('langLabelBM').textContent = this.currentLanguage === 'en' ? 'Bahasa Malaysia' : 'English';
-                
-                this.updateAllViews();
-                this.updateStats();
             }
         };
         
-        // Initialize app on page load
+        // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
